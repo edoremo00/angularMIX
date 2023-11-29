@@ -1,0 +1,34 @@
+ANGULAR E DI
+in angular è presente il così detto HIERARCHICAL INJECTOR
+ossi iniettore gerarcico (da padre a figli)
+noi infatti possiamo definire i servizi in diversi posti e modi(Injectable o sintassi con providers o sintassi con inject)
+ognuno di questi modi genera però risultati diversi riguardo alle istanze che otteniamo
+
+DEFINISCO SERVIZIO IN APPMODULE
+    - la stessa istanza è disponibile in tutta l'applicazione
+
+// IN APPCOMPONENT
+    la stessa istanza è disponibile ad appcomponent e suoi componenti figli
+
+//
+
+INIETTARE SERVIZI IN ALTRI SERVIZI
+
+non è possibile farlo usando sintassi providers in componente. bisogna farlo con la
+stessa sintassi a livello del modulo(sempre in array dei providers)
+
+il servizio che lo riceverà deve avere decoratore INJECTABLE
+questo dice ad angular che in quel servizio potrà iniettare altre cose
+
+
+ANGULAR TUTTAVIA ORA RACCOMNADA DI AGGIUNGERE DECORATROE INJECTABLE A TUTTI SERVIZI
+ANCHE SE TECNICAMENTE AL MOMENTO NON FA NULLA IN QUESTI CASI
+
+
+Since the rules when to use @Injectable and when not to use it, like described by Max in this lecture, are in fact confusing, the Angular team has changed the recommendation in the meantime: Now we should decorate all services with @Injectable().
+
+But the general rules taught in this section are still the same:
+
+● A service provided somewhere on module ('root') level - no matter in which module, or with the newer @Injectable({providedIn: 'root'}) syntax (see lecture 114) - is an app-wide Singleton (if it is not overwritten somewhere on component level).
+
+● A service provided in a component shares the same instance between this component and its descendants (if it is not overwritten there).

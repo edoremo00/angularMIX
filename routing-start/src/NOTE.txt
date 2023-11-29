@@ -1,0 +1,131 @@
+Routerlink--> direttiva che permette ad Angular di cambiare le rotte che ho definito
+le rotte sono definite in un array di rotte che contiene un semplice oggetto JavaScript
+le cui property principali sono path(ossia il percorso per la rotta) e component che serve per dire ad ANGULAR che componente deve caricare per quella rotta
+
+per navigare tra le pagine è fondamentale usare il servizio Router( se navigo tramite codice)
+
+oppure la direttiva routerlink. questo perchè se andassi ad usare il semplice href degli url la pagina verrebbe ricaricata
+ e quindi la mia app riavviata ed eventuali stati persi
+
+ routerlink supporta diverse sintassi
+ posso specificare i percorsi all'interno di un array o meno ad esempio
+
+ è importante sapere che è possibile omettere lo slash se la navigazione parte dal componente root o comunque quello 
+ che mi fa da componente principale in quanto routerlink aggiungerà automaticamente lo slash
+
+ se sono in un componente figlio se ometto lo slash otterei comunque /e nome rotta messa
+ posso inoltre specificare la rotta a mo di directory come ../ il quale torna indietro alla rotta padre principale
+
+ assieme a routerlink esiste anche un altra direttiva detta routerlinkactive che permette di applicare una classe css ai link attivi
+
+ di defualt fa il match con la rotta vedendo che esista al suo interno
+ nella nostra app ciò fa in modo che la rotta home è sempre attiva dal momento che
+ localhost:4200 è contenuto in ogni path
+
+ per risolvere occorre passare a questa direttiva un opzione che permette di applicare la classe css solo
+ se esiste una piena corrispondenza 
+ [routerLinkActiveOptions]="{exact: true}"
+
+
+ NAVIGARE PROGRAMMATICAMENTE CON Router
+
+  this.router.navigate(['servers']);
+   a differenza di routerlink questo metodo navigate non sa in che rotta ti trovi
+   navigare quindi in servers sarà per lui URL APP/servers. con routerlink se ero già
+   in pagina servers con questa sintassi sarei finito a URL APP/servers/servers che è una rotta che non esiste
+
+   il comportamento di navigate può essere modificato passando come parametro un oggetto al metodo
+   
+this.router.navigate(['servers'], { relativeTo: this.activeroute });
+
+relativeto vuole un oggetto di tipo activatedroute che è un servizio che ci da angular con tutte le info relative all'url attivo
+così facendo emula il comportamento di default che spacca l'app perchè partirà dalla rotta servers e ci aggiungerà /servers
+ ad essa che non esiste nella nostra applicazione
+
+ AGGIUNGERE PARAMETRI A rotte
+ si definiscono nel routing module con :[nome qualsiasi] i due punti
+ dicono ad Angular che quella parte di URL è dinamica
+
+ ACCEDERE A PARAMETRI ROTTE
+
+ lo si fa tramite servizio ActivatedRoute. ci fornisce principalmente 2 modi
+
+ snapshot--> utile se parametri non cambiano--> altrimenti non si aggiorna(se ricarico il componente da se stesso)
+
+ params che è un observable e quindi utile per reagire a questi cambiamenti
+
+ AGGIUNGERE QUERYPARAMS E FRAGMENT
+ fragment sono fatti con #nome e sono utili per scrollarle direttamente ad una sezione della pagina
+ usando direttiva routerlink posso specificare i parametri specificando due nuove property
+ che sono [queryParams]="{allowEdit:'1'}" [fragment]="'loading'"
+
+ per quanto riguarda il farlo tramite codice usando il metodo navigate specifico comesecondo parametro un oggetto JavaScript
+ in cui specifico le property queryparams e fragment
+
+ RECUPERARE QUERYPARAMS E FRAGMENT
+
+ possiamo sempre farlo tramite snapshot che ci fornisce property queryparams e fragment
+ con stessi problemi visti prima se viene fatto reloading in stessa pagina
+
+     console.log(this.route.snapshot.queryParams);
+    console.log(this.route.snapshot.fragment);
+
+oppure usare i due observable 
+ this.route.queryParams.subscribe()
+    this.route.fragment.subscribe()
+
+GUARDS
+logica eseguita prima che rotta è caricata 
+
+CAN ACTIVATE:
+come tutte le guard posso fornire ad angular un servizio oppure direttamente una funzione
+la funzione può ritornare
+    - un observable di boolean
+    - una promise di boolean
+    -un boolean direttamente
+
+se la funzione ritorna true la navigazione avviene altrimenti no
+
+per fare una guard mi serve una classe che implementa interfaccia can activate
+
+
+CAN ACTIVATE CHILD 
+è la stessa cos di can activate, anche il modo di implementare è lo stesso
+serve per proteggere le rotte figlie
+
+CAN DEACTIVATE
+
+questa guard è diversa dalle altre 2. per crearla ci serve una classe
+questa classe implementa interfaccia della guard. questa interfaccia è generica
+e prende un parametro interno che userà per chiamare un metodo del component a cui è applicata la guard
+questo metodo deve ritornare sempre 
+    - un observable di boolean
+    - una promise di boolean
+    -un boolean direttamente
+per stabilire se posso o meno lasciare la pagina
+
+
+PASSAGGIO DI DATI STATICI A componente
+
+lo si fa in fase di navigazione, specificando oggetto data se lo definisco a livello 
+di approuting module oppure oggetto state in metodo navigate della classe router
+
+PASSAGGIO DATI DINAMICI(RESOLVE GUARD)  
+
+per farlo ci si avvale o dell'oggetto state quando navighiamo direttamente oppure si può
+usare la resolve guard.
+
+la resolve guard è molto utile nel caso in cui io debba recuperare dei dati prima di navigare 
+ad una pagina. arrivando quindi sulla pagina con il componente già inizializzato
+
+la si definisce sempre tramite un servizio, questo servizio deve implementare interfaccia
+resolve, la quale ha un generic che definisce il tipo di dato che dovrò recuperare
+
+in app routing module la guard resolve si specifica tramite un oggetto JavaScript
+la property che definiamo al suo interno sarà quella che userà angular per salvare i dati che li abbiamo chiesto
+
+sia che noi abbiamo passato dati statici o dati dinamici accediamo ad entrambi tramite property data della classe Activatedroute
+in caso di dati statici usando snapshot.data in caso di dati dinamici usando l'observable data
+
+
+
